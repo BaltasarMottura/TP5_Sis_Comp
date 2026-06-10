@@ -12,7 +12,7 @@ MAX_POINTS = 120
 
 state_lock = threading.Lock()
 points = deque(maxlen=MAX_POINTS)   
-meta = {"signal": 1, "type": "senoidal", "unit": "V"}
+meta = {"signal": 1, "type": "triangular", "unit": "V"}
 epoch = 0                           
 reader_proc = None                  
 
@@ -55,7 +55,7 @@ def switch_signal(n):
         points.clear()      
         epoch += 1
         meta["signal"] = n
-        meta["type"] = "cuadrada" if n == 2 else "senoidal"
+        meta["type"] = "cuadrada" if n == 2 else "triangular"
     return True
 
 
@@ -79,32 +79,47 @@ class Handler(BaseHTTPRequestHandler):
                 with open(os.path.join(HERE, "index.html"), "rb") as f:
                     self._send(200, f.read(), "text/html; charset=utf-8")
             except FileNotFoundError:
-                self._send(404, "index.html no encontrado", "text/plain")
+               self._send(404, "index.html no encontrado", "text/plain")
             return
+
+    # ===== NUEVO BLOQUE =====
+        if url.path == "/messi.jpg":
+            try:
+                with open(os.path.join(HERE, "messi.jpg"), "rb") as f:
+                    self._send(200, f.read(), "image/jpeg")
+            except FileNotFoundError:
+               self._send(404, "messi.jpg no encontrado", "text/plain")
+            return
+    # ========================
 
         if url.path == "/data":
-            with state_lock:
-                payload = {
-                    "epoch": epoch,
-                    "signal": meta["signal"],
-                    "type": meta["type"],
-                    "unit": meta["unit"],
-                    "points": list(points),
-                }
-            self._send(200, json.dumps(payload))
-            return
+          with state_lock:
+            payload = {
+                "epoch": epoch,
+                "signal": meta["signal"],
+                "type": meta["type"],
+                "unit": meta["unit"],
+                "points": list(points),
+            }
+          self._send(200, json.dumps(payload))
+          return
 
         if url.path == "/select":
-            qs = parse_qs(url.query)
-            try:
-                n = int(qs.get("signal", ["1"])[0])
-                n = 2 if n == 2 else 1
-            except ValueError:
+             qs = parse_qs(url.query)
+
+             try:
+                 n = int(qs.get("signal", ["1"])[0])
+                 n = 2 if n == 2 else 1
+             except ValueError:
                 n = 1
-            ok = switch_signal(n)
-            self._send(200 if ok else 500,
-                       json.dumps({"ok": ok, "signal": n}))
-            return
+
+             ok = switch_signal(n)
+
+             self._send(
+                200 if ok else 500,
+                json.dumps({"ok": ok, "signal": n})
+             )
+             return
 
         self._send(404, "No encontrado", "text/plain")
 
@@ -113,7 +128,7 @@ def main():
     global reader_proc
 
     ap = argparse.ArgumentParser(description="Servidor web del TP#5")
-    ap.add_argument("--reader", default=os.path.join(HERE, "..", "app", "reader"),
+    ap.add_argument("--reader", default=os.path.join(HERE, "..", "app", "app"),
                     help="ruta al ejecutable reader (C)")
     ap.add_argument("--dev", default="/dev/SdeC_signals",
                     help="path del device")
@@ -137,7 +152,7 @@ def main():
 
     with state_lock:
         meta["signal"] = args.signal
-        meta["type"] = "cuadrada" if args.signal == 2 else "senoidal"
+        meta["type"] = "cuadrada" if args.signal == 2 else "triangular"
 
     t = threading.Thread(target=reader_loop, args=(reader_proc,), daemon=True)
     t.start()

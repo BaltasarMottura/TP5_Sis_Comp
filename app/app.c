@@ -25,7 +25,7 @@ static void scale(int sig, int raw, double *value, const char **type,
 		*unit  = "V";
 		*value = raw * 3.3 / 1000.0;
 	} else {
-		*type  = "senoidal";
+		*type  = "triangular";
 		*unit  = "V";
 		*value = raw * 5.0 / 1000.0;
 	}

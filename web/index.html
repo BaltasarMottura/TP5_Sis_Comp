@@ -3,21 +3,33 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TP#5 — Osciloscopio CDD</title>
+<title>TP#5 sangre-SUDO-gloria</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   :root{
-    --bg:#0a0f0d; --panel:#101814; --grid:#15241c;
-    --phos:#39ff14; --phos-dim:#1f8a12; --amber:#ffb000;
-    --ink:#bfe8c4; --muted:#5b7a63; --edge:#1d2b22;
-  }
+    --bg:#ffffff;
+    --panel:#ffffff;
+    --grid:#e0e0e0;
+    --phos:#000000;
+    --phos-dim:#444444;
+    --amber:#000000;
+    --ink:#000000;
+    --muted:#666666;
+    --edge:#cccccc;
+}
   *{box-sizing:border-box;margin:0;padding:0}
   body{
-    background:radial-gradient(120% 90% at 50% -10%, #13201a 0%, var(--bg) 60%);
+    background-image:url('/messi.jpg');
+    background-size:cover;
+    background-position:center;
+    background-attachment:fixed;
+    background-repeat:no-repeat;
+
     color:var(--ink);
     font-family:"IBM Plex Mono","DejaVu Sans Mono",monospace;
-    min-height:100vh; padding:24px;
-  }
+    min-height:100vh;
+    padding:24px;
+}
   .wrap{max-width:980px;margin:0 auto}
   header{
     display:flex;align-items:baseline;justify-content:space-between;
@@ -37,7 +49,10 @@
   .field{display:flex;flex-direction:column;gap:2px}
   .field .lbl{font-size:10px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
   .field .val{font-size:26px;color:var(--phos);text-shadow:0 0 8px rgba(57,255,20,.5);line-height:1}
-  .field .val.amber{color:var(--amber);text-shadow:0 0 8px rgba(255,176,0,.45)}
+  .field .val{
+    color:var(--phos);
+    text-shadow:none;
+}
   .field .val.small{font-size:16px}
   .chartbox{position:relative;height:360px;width:100%}
   .controls{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap;align-items:center}
@@ -57,10 +72,14 @@
 <body>
 <div class="wrap">
   <header>
-    <h1>SDEC&nbsp;<span class="sub">// osciloscopio cdd</span></h1>
+    <h1>TP5 - Character Device Driver</h1>
     <div class="stamp"><span class="led"></span><span id="status">conectando…</span></div>
   </header>
 
+  <p class="descripcion">
+Por fin anda. Esta es la señal muestreada desde el driver ejecutándose en una Raspberry Pi virtual (QEMU).
+Los datos son obtenidos mediante un character device driver y visualizados a través de una interfaz web.
+</p>
   <div class="scope">
     <div class="readout">
       <div class="field"><span class="lbl">Tipo de señal</span><span class="val" id="type">—</span></div>
@@ -73,7 +92,7 @@
 
   <div class="controls">
     <div class="grp">
-      <button id="b1" class="active" onclick="select(1)">CH1 · Senoidal</button>
+      <button id="b1" class="active" onclick="select(1)">CH1 · Triangular</button>
       <button id="b2" onclick="select(2)">CH2 · Cuadrada</button>
     </div>
     <span class="hint">cambiar de canal resetea el barrido</span>
@@ -83,14 +102,16 @@
 <script>
 const TIME_ON_Y = false;
 
-const PHOS = '#39ff14', GRID = 'rgba(57,255,20,0.10)', TICK = '#5b7a63';
+const PHOS = '#000000',
+      GRID = 'rgba(0,0,0,0.12)',
+      TICK = '#444444';
 const ctx = document.getElementById('chart').getContext('2d');
 
 const chart = new Chart(ctx, {
   type: 'line',
   data: { labels: [], datasets: [{
     label: 'senal', data: [],
-    borderColor: PHOS, backgroundColor: 'rgba(57,255,20,0.08)',
+    borderColor: PHOS, backgroundColor: 'rgba(0,0,0,0.05)',
     borderWidth: 2, pointRadius: 2, pointBackgroundColor: PHOS,
     tension: 0.15, fill: true,
   }]},

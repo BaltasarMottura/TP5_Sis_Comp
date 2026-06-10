@@ -15,7 +15,7 @@
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Sistemas de Computacion - TP5");
-MODULE_DESCRIPTION("CDD que sensa dos senales simuladas (senoidal y cuadrada) cada 1 s");
+MODULE_DESCRIPTION("CDD que sensa dos senales simuladas (triangular y cuadrada) cada 1 s");
 MODULE_VERSION("1.0");
 
 
@@ -24,10 +24,12 @@ module_param(sq_period, int, 0644);
 MODULE_PARM_DESC(sq_period, "Periodo de la senal cuadrada en segundos (>=2)");
 
 
-#define SINE_LEN 24
-static const int sine_table[SINE_LEN] = {
-	    0,  259,  500,  707,  866,  966, 1000,  966,  866,  707,  500,  259,
-	    0, -259, -500, -707, -866, -966, -1000, -966, -866, -707, -500, -259
+#define TRI_LEN 24
+static const int tri_table[TRI_LEN] = {
+    -1000, -833, -666, -500, -333, -166,
+       0,  166,  333,  500,  666,  833,
+    1000,  833,  666,  500,  333,  166,
+       0, -166, -333, -500, -666, -833
 };
 
 static dev_t           dev_num;     
@@ -50,7 +52,7 @@ static void sample_cb(struct timer_list *t)
 
 	spin_lock_irqsave(&state_lock, flags);
 
-	signal1_raw = sine_table[t_seconds % SINE_LEN];
+	signal1_raw = tri_table[t_seconds % TRI_LEN];
 
 	signal2_raw = ((t_seconds % period) < (period / 2)) ? 1000 : 0;
 
