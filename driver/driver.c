@@ -10,11 +10,11 @@
 #include <linux/spinlock.h>
 #include <linux/version.h>
 
-#define DRV_NAME   "SdeC_signals"
+#define DRV_NAME   "driverTP5"
 #define CLASS_NAME "SdeC"
 
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Sistemas de Computacion - TP5");
+MODULE_AUTHOR("sangre-SUDO-gloria");
 MODULE_DESCRIPTION("CDD que sensa dos senales simuladas (triangular y cuadrada) cada 1 s");
 MODULE_VERSION("1.0");
 
